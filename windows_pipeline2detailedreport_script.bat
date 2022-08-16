@@ -2,7 +2,7 @@
 echo ---
 echo ---Curl down the pipeline2detailedreport converter
 echo ---
-curl -sSO https://raw.githubusercontent.com/jphillips-vc/pipeline2detailedreport/master/detailedreport.py
+curl -sSO https://raw.githubusercontent.com/cadonuno/pipeline2detailedreport/master/detailedreport.py 
 echo ---
 echo ---Curl the latest version of Veracode's Pipeline Scan
 echo ---
@@ -17,11 +17,11 @@ echo ---
 echo ---run the pipeline scan
 echo ---
 cd ..
-java -jar ./veracode/pipeline-scan.jar -f %1
+java -jar ./veracode/pipeline-scan.jar --veracode_api_id "%veracode_api_id%" --veracode_api_key "%veracode_api_key%" -f %1
 echo ---
 echo ---convert the results.json file to pipeline2detailedreport
 echo ---
-python detailedreport.py
+python detailedreport.py %2
 echo ---
 echo ---clean up
 echo ---

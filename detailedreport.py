@@ -2,9 +2,11 @@ import sys
 import json
 import argparse
 import xml.etree.ElementTree as ET
+import traceback
 #
 # 
 #
+modules={}
 flaws={}
 vulns={}
 vsum={}
@@ -83,25 +85,37 @@ def getJSONdata():
 		with open(jsonfile) as json_file:
 			pipelinedata = json.load(json_file)
 			#data2 = json.dumps(pipelinedata, indent=4)
-			#print(data2)
-			vulncount=0
-			if pipelinedata['scan_status'] == "SUCCESS":
+			#print(data2)			
+			if pipelinedata['scan_status'] == "SUCCESS":				
+				vulncount=0
+				sev0Count=0
+				sev1Count=0
+				sev2Count=0
+				sev3Count=0
+				sev4Count=0
+				sev5Count=0
 				for v in pipelinedata['findings']:
 					title=v['title']
 					issueid=str(v['issue_id'])
 					severity=str(v['severity'])
 					if severity == "5":
 						sevname = "Very High"
+						sev5Count+=1
 					elif severity == "4":
 						sevname = "High"
+						sev4Count+=1
 					elif severity == "3":
 						sevname = "Medium"
+						sev3Count+=1
 					elif severity == "2":
 						sevname = "Low"
+						sev2Count+=1
 					elif severity == "1":
 						sevname = "Very Low"
+						sev1Count+=1
 					elif severity == "0":
 						sevname = "Informational"
+						sev0Count+=1
 					issuetype=v['issue_type']
 					cweid=v['cwe_id']
 					displaytext=v['display_text']
@@ -126,6 +140,23 @@ def getJSONdata():
 					vulns[vulncount]={'title' : title, 'issueid' : issueid, 'severity' : sevname, 'issuetype' : issuetype, 'cweid' : cweid, 'displaytext' : displaytext, 'file' : file, 'path' : path, 'line' : line, 'qualifiedfunctionname' : qualifiedfunctionname, 'functionprototype' : functionprototype, 'scope' : scope}
 					vulnlist.append([str(cweid), str(sevname), str(title), str(issuetype), str(file), str(line), str(scope)])
 					vulncount = vulncount + 1
+				moduleCount=0
+				for module in pipelinedata['modules']:
+					modules[moduleCount]= {
+							'architecture':  "unknown",
+							'compiler': "unknown",
+							'loc': "9999",
+							'name': module,
+							'numflawssev0': str(sev0Count),
+							'numflawssev1': str(sev1Count),
+							'numflawssev2': str(sev2Count),
+							'numflawssev3': str(sev3Count),
+							'numflawssev4': str(sev4Count),
+							'numflawssev5': str(sev5Count),
+							'os': "unknown",
+							'score': "0"
+						}
+					moduleCount+=1
 			else:
 				sys.exit("Pipeline scan status not successful")
 	except:
@@ -401,9 +432,21 @@ def genXML():
 		static.set('submitted_date', '2019-07-18 20:44:55 UTC')
 		static.set('version', 'pipeline scanner')
 		### subtags under static-analysis for modules 
-		sub_static_1 = ET.SubElement(static, 'modules')
-		sub_sub_static_1 = ET.SubElement(sub_static_1, 'module')
-		sub_sub_static_2 = ET.SubElement(sub_static_1, 'module')
+		sub_modules = ET.SubElement(static, 'modules')
+		for index in modules:
+			moduleElement=ET.SubElement(sub_modules, 'module')
+			moduleElement.set('architecture', modules[index]['architecture'])
+			moduleElement.set('compiler', modules[index]['compiler'])
+			moduleElement.set('loc', modules[index]['loc'])
+			moduleElement.set('name', modules[index]['name'])
+			moduleElement.set('numflawssev0', modules[index]['numflawssev0'])
+			moduleElement.set('numflawssev1', modules[index]['numflawssev1'])
+			moduleElement.set('numflawssev2', modules[index]['numflawssev2'])
+			moduleElement.set('numflawssev3', modules[index]['numflawssev3'])
+			moduleElement.set('numflawssev4', modules[index]['numflawssev4'])
+			moduleElement.set('numflawssev5', modules[index]['numflawssev5'])
+			moduleElement.set('os', modules[index]['os'])
+			moduleElement.set('score', modules[index]['score'])
 		### subtag name severity
 		severity5 = ET.SubElement(xmldata, 'severity')
 		severity5.set('level', '5')
@@ -465,7 +508,7 @@ def genXML():
 			sub_sub_cwe_el_2.set('note', '')
 			sub_sub_cwe_el_2.set('pcirelated', 'false')
 			sub_sub_cwe_el_2.set('remediation_status', 'Open')
-			sub_sub_cwe_el_2.set('remediationeffort', '0')
+			sub_sub_cwe_el_2.set('remediationeffort', '1')
 			sub_sub_cwe_el_2.set('scope', flaws[x]['scope'])
 			sub_sub_cwe_el_2.set('severity', flaws[x]['severity'])
 			sub_sub_cwe_el_2.set('sourcefile', flaws[x]['file'])
@@ -540,8 +583,10 @@ def genXML():
 		# write XML
 		with open("detailed_report.xml", "wb") as f:
 			f.write(report_xml)
-	except:
-		sys.exit("Error writing xml report (see genXML)")
+	#except:
+		#sys.exit("Error writing xml report (see genXML)")
+	except Exception:
+		traceback.print_exc()
 
 def main():
 	#
