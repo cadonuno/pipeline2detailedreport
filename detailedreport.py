@@ -159,7 +159,8 @@ def getJSONdata():
 					moduleCount+=1
 			else:
 				sys.exit("Pipeline scan status not successful")
-	except:
+	except Exception:
+		traceback.print_exc()
 		sys.exit("Error within capturing JSON data (see getJSONdata)")
 
 #
@@ -183,7 +184,8 @@ def top25():
 				t25count = t25count + 1
 
 		return str(t25count)
-	except:
+	except Exception:
+		traceback.print_exc()
 		sys.exit("Error within defining Top 25 data (see top25)")
 #
 # GET VULN TOTALS BY SEVERITY
@@ -214,7 +216,8 @@ def vulnsummary(sev):
 		vsum={'5' : vh, '4' : h, '3' : m, '2' : l, '1' : vl, '0' : info, 'total' : total}
 		#print(vsum)
 		return vsum[sev]
-	except:
+	except Exception:
+		traceback.print_exc()
 		sys.exit("Error within capturing vuln summary data (see vulnsummary)")
 #
 # PRINT VULNS FOR A SPECIFIC SEVERITY 
@@ -224,7 +227,8 @@ def getVulns(severity):
 		for k, v in vulns.items():
 			if str(severity) in vulns[k]['severity']:
 				print(vulns[k])
-	except:
+	except Exception:
+		traceback.print_exc()
 		sys.exit("Error within capturing vuln data (see getVulns)")
 #
 # GET VULN DATA TABLE FOR HTML REPORT
@@ -241,7 +245,8 @@ def getVulnTable():
 				s+="[\""+ x[0] +"\", \""+ x[1] +"\", \""+ x[3] +"\", \""+ x[5] +"\", \""+ x[4] +"\", \""+ x[6] +"\"]"
 			vlistcounter=vlistcounter+1
 		return s
-	except:
+	except Exception:
+		traceback.print_exc()
 		sys.exit("Error within capturing vuln table data (see getVulnTable)")
 #
 # FUNCTION TO CAPTURE TOP 5 FLAWS FOUND
@@ -272,7 +277,23 @@ def topflaws():
 			r.append(' '.join(topflawlist[i]))
 
 		return ' '.join(r)
-	except:
+	except Exception:
+		traceback.print_exc()
+		sys.exit("Error within capturing top flaw data (see topflaws)")
+
+#
+# FUNCTION TO PRINT OUT THE MODULE LIST
+#
+def getModulesHtml():
+	try:
+		html=[]	
+		html.append(' '.join([str("<h3 style='color: #fff;'>Top-level modules:</h3><ul>")]))
+		for index in modules:
+			html.append(' '.join([str("<li><h3 style='color: #fff;'>" + modules[index]['name']+"</h3></li>")]))
+		html.append(' '.join([str("</ul>")]))
+		return ' '.join(html)
+	except Exception:
+		traceback.print_exc()
 		sys.exit("Error within capturing top flaw data (see topflaws)")
 
 
@@ -345,15 +366,18 @@ def writeHTML():
 			          <div class="logo">
 			            <img src="https://community.veracode.com/resource/1544728435000/VeracodeCommunityLogo" alt="Home" width="250">
 			          </div>
-			          <div class="report"><button class="pink"><a href="https://help.veracode.com/reader/tS9CaFwL4_lbIEWWomsJoA/ovfZGgu96UINQxIuTqRDwg" target="_blank">Help!</a></button></div>
+			          <div class="report"><button class="pink"><a href="https://docs.veracode.com/r/c_about_pipeline_scan" target="_blank">Not sure how to setup a pipeline scan?</a></button></div>
 			        </div>
 			        <div class="row">
 			          <div class="left column">
-			            <h2>PIPELINE SCAN RESULTS</h2>
+			            <h2>Pipeline Scan Results</h2>
 			            <div id="piechart" style="width: 500px; height: 300px;"></div>
 			          </div>
 			          <div class="middle column"><h2>TOP FLAWS</h2>"""+str(topflaws())+"""</div>
 			          <div class="right column"><h2>CWE TOP 25 FLAWS</h2><h5>"""+str(top25())+"""</h5></div>
+			        </div>
+					<div class="row">
+			          """+str(getModulesHtml())+"""
 			        </div>
 			        <div class="row">
 			          <div id="gridjs"></div>
@@ -375,7 +399,8 @@ def writeHTML():
 			"""
 		f.write(html1)
 		f.close()
-	except:
+	except Exception:
+		traceback.print_exc()
 		sys.exit("Error creating html report (see writeHTML)")
 
 #
@@ -583,10 +608,9 @@ def genXML():
 		# write XML
 		with open("detailed_report.xml", "wb") as f:
 			f.write(report_xml)
-	#except:
-		#sys.exit("Error writing xml report (see genXML)")
 	except Exception:
 		traceback.print_exc()
+		sys.exit("Error writing xml report (see genXML)")
 
 def main():
 	#

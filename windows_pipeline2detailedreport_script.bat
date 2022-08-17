@@ -17,11 +17,12 @@ echo ---
 echo ---run the pipeline scan
 echo ---
 cd ..
-java -jar ./veracode/pipeline-scan.jar --veracode_api_id "%veracode_api_id%" --veracode_api_key "%veracode_api_key%" -f %1
+if "%skip_scan%"=="true" (java -jar ./veracode/pipeline-scan.jar --veracode_api_id "%veracode_api_id%" --veracode_api_key "%veracode_api_key%" -f %file%)
 echo ---
 echo ---convert the results.json file to pipeline2detailedreport
 echo ---
-python detailedreport.py %2
+if [%html_output%]==[] (set html_output=true)
+if "%html_output%" == "true" (python detailedreport.py --html) else (python detailedreport.py)
 echo ---
 echo ---clean up
 echo ---
