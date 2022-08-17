@@ -19,15 +19,21 @@ top25list=['79','787','20','125','119','89','200','416','352','78','190','22','4
 parser = argparse.ArgumentParser(description='Accept flags from CLI')
 parser.add_argument('-f', action="store", dest="f", help="Pass the filename of the pipeline scan json file")
 parser.add_argument('--html', dest='html', action='store_true', help="Creates HTML report of the pipeline scan json file")
-parser.add_argument('--no-html', dest='html', action='store_false', help="Default option prints no html report")
+parser.add_argument('--html_name', dest='html_name', action='store', help="Name of HTML file to generate")
+parser.add_argument('--xml_name', dest='xml_name', action='store', help="Name of XML file to generate")
 parser.set_defaults(html=False)
 args = parser.parse_args()
 htmlreport = args.html
 jsonfile = str(args.f)
+html_name = str(args.html_name)
+xml_name = str(args.xml_name)
 if str(jsonfile) == "None":
 	jsonfile = 'results.json'
-else:
-	jsonfile = str(args.f)
+if str(html_name) == "None":
+	html_name = "pipeline-report.html"
+if str(xml_name) == "None":
+	xml_name = "detailed_report.xml"
+
 '''
 ########################
 # DATA SCHEMA
@@ -302,7 +308,7 @@ def getModulesHtml():
 #
 def writeHTML():
 	try:
-		f = open("pipeline-report.html", "w")
+		f = open(html_name, "w")
 		html1 = """<html>
 			<head>
 				<script src="https://unpkg.com/gridjs/dist/gridjs.production.min.js"></script>
@@ -606,7 +612,7 @@ def genXML():
 		report_xml = ET.tostring(xmldata)
 
 		# write XML
-		with open("detailed_report.xml", "wb") as f:
+		with open(xml_name, "wb") as f:
 			f.write(report_xml)
 	except Exception:
 		traceback.print_exc()
