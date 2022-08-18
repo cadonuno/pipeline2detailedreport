@@ -21,7 +21,7 @@ if "%skip_scan%"=="true" (
 	echo --- run the pipeline scan
 	echo ---
 	cd ..
-	if not "%issue_details"=="true" (
+	if not "%issue_details%"=="true" (
 		set issue_details=false
 	)
 	if [%baseline_file%]==[] (
@@ -37,8 +37,14 @@ echo ---
 if [%html_output%]==[] (set html_output=true)
 if "%html_output%" == "true" (
 	python detailedreport.py --html
+	if not [%baseline_file%]==[] (
+		python detailedreport.py --html --html_name "pipeline-report-filtered.html" --xml_name "detailed_report_filtered.xml" -f filtered_results.json
+	)
 ) else (
-python detailedreport.py
+	python detailedreport.py
+	if not [%baseline_file%]==[] (
+		python detailedreport.py --xml_name "detailed_report_filtered.xml" -f filtered_results.json
+	)
 )
 
 if not "%skip_scan%"=="true" (

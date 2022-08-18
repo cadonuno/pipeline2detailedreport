@@ -279,8 +279,9 @@ def topflaws():
 				topflawlist.append([str(rec)])
 
 		r=[]	
-		for i in range(5):
-			r.append(' '.join(topflawlist[i]))
+		if topflawlist:
+			for i in range(min(5, len(topflawlist))):
+				r.append(' '.join(topflawlist[i]))
 
 		return ' '.join(r)
 	except Exception:
@@ -372,7 +373,7 @@ def writeHTML():
 			          <div class="logo">
 			            <img src="https://community.veracode.com/resource/1544728435000/VeracodeCommunityLogo" alt="Home" width="250">
 			          </div>
-			          <div class="report"><button class="pink"><a href="https://docs.veracode.com/r/c_about_pipeline_scan" target="_blank">Not sure how to setup a pipeline scan?</a></button></div>
+			          <div class="report"><button class="pink"><a href="https://docs.veracode.com/" target="_blank">Need help?</a></button></div>
 			        </div>
 			        <div class="row">
 			          <div class="left column">
