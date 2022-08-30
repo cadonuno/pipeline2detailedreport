@@ -1,5 +1,5 @@
 # pipeline2detailedreport
-<b>USAGE:  python detailedrerport.py [--html] [-f filename.json]</b>
+<b>USAGE:  python detailedreport.py [--html] [-f filename.json]</b>
 		
 --html will generate a local html report from the json file
 		
